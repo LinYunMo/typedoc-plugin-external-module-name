@@ -34,7 +34,7 @@ type CustomModuleNameMappingFn = (
  * It also allows multiple ES6 modules to be merged together into a single TypeDoc module.
  *
  * @usage
- * At the top of an ES6 module, add a "dynamic module comment".  Insert "@module typedocModuleName" to
+ * At the top of an ES6 module, add a "dynamic module comment".  Insert "@category typedocModuleName" to
  * specify that this ES6 module should be merged with module: "typedocModuleName".
  *
  * Similar to the [[DynamicModulePlugin]], ensure that there is a comment tag (even blank) for the
@@ -44,7 +44,7 @@ type CustomModuleNameMappingFn = (
  * ```
  *
  * &#47;**
- *  * @module newModuleName
+ *  * @category newModuleName
  *  *&#47;
  * &#47;** for typedoc &#47;
  * import {foo} from "../foo";
@@ -115,14 +115,14 @@ export class ExternalModuleNamePlugin extends ConverterComponent {
    *
    * Order of precedence:
    * 1) custom function found in .typedoc-plugin-external-module-name.js
-   * 2) explicit @module tag
+   * 2) explicit @category tag
    * 3) auto-create a module name based on the directory
    */
   private getModuleName(context: Context, reflection: Reflection, node): [string, boolean] {
     const comment = getRawComment(node);
     const preferred = /@preferred/.exec(comment) != null;
-    // Look for @module
-    const [, match] = /@module\s+([\w\u4e00-\u9fa5\.\-_/@"]+)/.exec(comment) || [];
+    // Look for @category
+    const [, match] = /@category\s+([\w\u4e00-\u9fa5\.\-_/@"]+)/.exec(comment) || [];
     // Make a guess based on enclosing directory structure
     const filename = reflection.sources[0].file.fullFileName;
 
@@ -157,7 +157,7 @@ export class ExternalModuleNamePlugin extends ConverterComponent {
 
     // Remove the tags
     if (reflection.comment) {
-      removeTags(reflection.comment, 'module');
+      removeTags(reflection.comment, 'category');
       removeTags(reflection.comment, 'preferred');
       if (isEmptyComment(reflection.comment)) {
         delete reflection.comment;
@@ -237,7 +237,7 @@ export class ExternalModuleNamePlugin extends ConverterComponent {
 
       // Remove @module and @preferred from the comment, if found.
       if (mergeTarget.comment) {
-        removeTags(mergeTarget.comment, 'module');
+        removeTags(mergeTarget.comment, 'category');
         removeTags(mergeTarget.comment, 'preferred');
       }
       if (isEmptyComment(mergeTarget.comment)) {
